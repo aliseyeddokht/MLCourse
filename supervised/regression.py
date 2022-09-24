@@ -5,12 +5,15 @@ from supervised.model import Model
 
 
 class Regression(Model):
-    def __init__(self, theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations):
-        super().__init__(theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations)
+    def __init__(self, theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations,
+                 lambda_coefficient):
+        super().__init__(theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations,
+                         lambda_coefficient)
 
     def J(self, y, y_h):
+        penalty = self.lambda_coefficient * np.linalg.norm(self.theta) ** 2
         e = y_h - y
-        return np.asscalar(0.5 * e.T @ e)
+        return 0.5 * np.asscalar(e.T @ e) + penalty
 
     def evaluate(self, X_train, y_train, X_val, y_val):
         y_train_h = self.predict(X_train)
@@ -31,7 +34,7 @@ class Regression(Model):
 
     def visualize_model_performance(self):
         metrics = self.iterations_metrics
-        fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4)
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
         plt.suptitle(f"Regression Evaluation")
         ax1.set_xlabel("Iteration")
         ax1.set_ylabel("MSE")
@@ -56,31 +59,31 @@ class Regression(Model):
         iterations, mae = range(len(metrics["MAE_VAL"])), metrics["MAE_VAL"]
         ax3.plot(iterations, mae, label="Validation")
         ax3.legend()
+        plt.show()
 
-        ax4.set_xlabel("Iteration")
-        ax4.set_ylabel("J")
+        plt.xlabel("Iteration")
+        plt.ylabel("J")
         iterations, J = range(len(metrics["J_TRAIN"])), metrics["J_TRAIN"]
-        ax4.plot(iterations, J, label="Training")
+        plt.plot(iterations, J, label="Training")
         iterations, J = range(len(metrics["J_VAL"])), metrics["J_VAL"]
-        ax4.plot(iterations, J, label="Validation")
-        ax4.legend()
-
+        plt.plot(iterations, J, label="Validation")
+        plt.legend()
         plt.show()
 
 
-
-
 class LinearRegression(Regression):
-    def __init__(self, number_of_features, learning_rate=1e-8, converge_tolerance=100, converge_metric="RMSE_TRAIN",
-                 max_iterations=1000):
-        super().__init__((number_of_features, 1), learning_rate, converge_tolerance, converge_metric, max_iterations)
+    def __init__(self, number_of_features, learning_rate=1e-8, converge_tolerance=100,
+                 converge_metric="RMSE_TRAIN", max_iterations=1000, lambda_coefficient=0):
+        super().__init__((number_of_features, 1), learning_rate, converge_tolerance, converge_metric, max_iterations,
+                         lambda_coefficient)
 
     def predict(self, X):
         return X @ self.theta
 
     def gradient(self, X, y):
+        penalty = self.lambda_coefficient * self.theta
         y_h = self.predict(X)
-        return X.T @ (y_h - y)
+        return X.T @ (y_h - y) + penalty
 
 
 class NormalEquationRegression:
@@ -95,9 +98,9 @@ class NormalEquationRegression:
 
 class PolynomialRegression(Regression):
     def __init__(self, degree, number_of_features, learning_rate=1e-8, converge_tolerance=100,
-                 converge_metric="RMSE_TRAIN", max_iterations=1000):
+                 converge_metric="RMSE_TRAIN", max_iterations=1000, lambda_coefficient=0):
         super().__init__((number_of_features, degree + 1), learning_rate, converge_tolerance, converge_metric,
-                         max_iterations)
+                         max_iterations, lambda_coefficient)
 
     def predict(self, X):
         N = len(X)
@@ -107,9 +110,10 @@ class PolynomialRegression(Regression):
         return np.expand_dims(result, axis=1)
 
     def gradient(self, X, y):
+        penalty = self.lambda_coefficient * self.theta
         N = len(X)
         K, D = self.theta.shape
         Tensor = np.repeat(X, D).reshape((N, K, D)) ** range(D)
         M = K * D
         error = np.repeat((self.predict(X) - y), M).reshape((N, K, D))
-        return np.sum(Tensor * error, axis=0)
+        return np.sum(Tensor * error, axis=0) + penalty

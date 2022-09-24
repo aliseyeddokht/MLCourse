@@ -4,7 +4,7 @@ import numpy as np
 import datasets.data_loader
 from supervised.classification import PolynomialLogisticRegression
 
-dataset_file = "../../datasets/nested_circles_classification"
+dataset_file = "../../datasets/quadratic_logistic_regression"
 X_train, y_train, X_val, y_val, K = datasets.data_loader.load(dataset_file)
 
 X_train_C0 = X_train[np.where(np.any(y_train == 0, axis=1))]
@@ -13,7 +13,7 @@ X_train_C1 = X_train[np.where(np.any(y_train == 1, axis=1))]
 X_val_C0 = X_val[np.where(np.any(y_val == 0, axis=1))]
 X_val_C1 = X_val[np.where(np.any(y_val == 1, axis=1))]
 
-classifier = PolynomialLogisticRegression(2, K, learning_rate=6e-6)
+classifier = PolynomialLogisticRegression(2, K, learning_rate=6e-6, lambda_coefficient=1)
 classifier.fit(X_train, y_train, X_val, y_val)
 
 plt.title("Logistic Regression")

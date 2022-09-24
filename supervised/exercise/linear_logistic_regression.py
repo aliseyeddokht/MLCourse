@@ -13,8 +13,8 @@ X_train_C1 = X_train[np.where(np.any(y_train == 1, axis=1))]
 X_val_C0 = X_val[np.where(np.any(y_val == 0, axis=1))]
 X_val_C1 = X_val[np.where(np.any(y_val == 1, axis=1))]
 
-classifier = LinearLogisticRegression(K)
-metrics = classifier.fit(X_train, y_train, X_val, y_val)
+classifier = LinearLogisticRegression(K, learning_rate=4e-4, lambda_coefficient=1)
+classifier.fit(X_train, y_train, X_val, y_val)
 
 plt.title("Logistic Regression")
 plt.xlabel("$X$")

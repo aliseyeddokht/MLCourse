@@ -7,8 +7,8 @@ from supervised.regression import PolynomialRegression
 dataset_file = "../../datasets/cubic_regression"
 X_train, y_train, X_val, y_val, K = datasets.data_loader.load(dataset_file)
 
-regressor = PolynomialRegression(3, K, learning_rate=2e-8)
-metrics = regressor.fit(X_train, y_train, X_val, y_val)
+regressor = PolynomialRegression(3, K, lambda_coefficient=1)
+regressor.fit(X_train, y_train, X_val, y_val)
 
 plt.title("Cubic Regression")
 plt.xlabel("X")

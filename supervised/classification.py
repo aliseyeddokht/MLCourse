@@ -6,9 +6,9 @@ from supervised.model import Model
 
 class Classification(Model):
     def __init__(self, theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations,
-                 lambda_coefficient):
+                 penalty_coefficient):
         super().__init__(theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations,
-                         lambda_coefficient)
+                         penalty_coefficient)
 
     def evaluate(self, X_train, y_train, X_val, y_val):
         y_h_train = self.predict(X_train)
@@ -77,31 +77,31 @@ class Classification(Model):
 
 class LinearLogisticRegression(Classification):
     def __init__(self, number_of_features, learning_rate=1e-8, converge_tolerance=100, converge_metric="ACCURACY_TRAIN",
-                 max_iterations=1000, lambda_coefficient=0):
+                 max_iterations=1000, penalty_coefficient=0):
         super().__init__((number_of_features, 1), learning_rate, converge_tolerance, converge_metric, max_iterations,
-                         lambda_coefficient)
+                         penalty_coefficient)
 
     def J(self, y, y_h):
-        penalty = self.lambda_coefficient / 2 * np.linalg.norm(self.theta) ** 2
+        penalty = self.penalty_coefficient / 2 * np.linalg.norm(self.theta) ** 2
         return np.sum(-(y * np.log(y_h)) - ((1 - y) * np.log(1 - y_h))) + penalty
 
     def predict(self, X):
         return 1 / (1 + np.exp(-X @ self.theta))
 
     def gradient(self, X, y):
-        penalty = self.lambda_coefficient * self.theta
+        penalty = self.penalty_coefficient * self.theta
         y_h = self.predict(X)
         return X.T @ (y_h - y) + penalty
 
 
 class PolynomialLogisticRegression(Classification):
     def __init__(self, degree, number_of_features, learning_rate=1e-8, converge_tolerance=100,
-                 converge_metric="ACCURACY_TRAIN", max_iterations=1000, lambda_coefficient=0):
+                 converge_metric="ACCURACY_TRAIN", max_iterations=1000, penalty_coefficient=0):
         super().__init__((number_of_features, degree + 1), learning_rate, converge_tolerance, converge_metric,
-                         max_iterations, lambda_coefficient)
+                         max_iterations, penalty_coefficient)
 
     def J(self, y, y_h):
-        penalty = self.lambda_coefficient / 2 * np.linalg.norm(self.theta) ** 2
+        penalty = self.penalty_coefficient / 2 * np.linalg.norm(self.theta) ** 2
         return np.sum(-(y * np.log(y_h)) - ((1 - y) * np.log(1 - y_h))) + penalty
 
     def predict(self, X):
@@ -113,7 +113,7 @@ class PolynomialLogisticRegression(Classification):
         return np.expand_dims(result, axis=1)
 
     def gradient(self, X, y):
-        penalty = self.lambda_coefficient * self.theta
+        penalty = self.penalty_coefficient * self.theta
         N = len(X)
         K, D = self.theta.shape
         Tensor = np.repeat(X, D).reshape((N, K, D)) ** range(D)

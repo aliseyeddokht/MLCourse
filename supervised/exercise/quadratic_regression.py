@@ -7,7 +7,7 @@ from supervised.regression import PolynomialRegression
 dataset_file = "../../datasets/quadratic_regression"
 X_train, y_train, X_val, y_val, K = datasets.data_loader.load(dataset_file)
 
-regressor = PolynomialRegression(2, K, learning_rate=6e-6, lambda_coefficient=1)
+regressor = PolynomialRegression(2, K, learning_rate=6e-6, penalty_coefficient=1)
 regressor.fit(X_train, y_train, X_val, y_val)
 
 plt.title("Simple Polynomial Regression")

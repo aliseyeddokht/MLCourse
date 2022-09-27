@@ -6,12 +6,12 @@ from supervised.model import Model
 
 class Regression(Model):
     def __init__(self, theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations,
-                 lambda_coefficient):
+                 penalty_coefficient):
         super().__init__(theta_shape, learning_rate, converge_tolerance, converge_metric, max_iterations,
-                         lambda_coefficient)
+                         penalty_coefficient)
 
     def J(self, y, y_h):
-        penalty = self.lambda_coefficient * np.linalg.norm(self.theta) ** 2
+        penalty = self.penalty_coefficient * np.linalg.norm(self.theta) ** 2
         e = y_h - y
         return 0.5 * np.asscalar(e.T @ e) + penalty
 
@@ -73,15 +73,15 @@ class Regression(Model):
 
 class LinearRegression(Regression):
     def __init__(self, number_of_features, learning_rate=1e-8, converge_tolerance=100,
-                 converge_metric="RMSE_TRAIN", max_iterations=1000, lambda_coefficient=0):
+                 converge_metric="RMSE_TRAIN", max_iterations=1000, penalty_coefficient=0):
         super().__init__((number_of_features, 1), learning_rate, converge_tolerance, converge_metric, max_iterations,
-                         lambda_coefficient)
+                         penalty_coefficient)
 
     def predict(self, X):
         return X @ self.theta
 
     def gradient(self, X, y):
-        penalty = self.lambda_coefficient * self.theta
+        penalty = self.penalty_coefficient * self.theta
         y_h = self.predict(X)
         return X.T @ (y_h - y) + penalty
 
@@ -98,9 +98,9 @@ class NormalEquationRegression:
 
 class PolynomialRegression(Regression):
     def __init__(self, degree, number_of_features, learning_rate=1e-8, converge_tolerance=100,
-                 converge_metric="RMSE_TRAIN", max_iterations=1000, lambda_coefficient=0):
+                 converge_metric="RMSE_TRAIN", max_iterations=1000, penalty_coefficient=0):
         super().__init__((number_of_features, degree + 1), learning_rate, converge_tolerance, converge_metric,
-                         max_iterations, lambda_coefficient)
+                         max_iterations, penalty_coefficient)
 
     def predict(self, X):
         N = len(X)
@@ -110,7 +110,7 @@ class PolynomialRegression(Regression):
         return np.expand_dims(result, axis=1)
 
     def gradient(self, X, y):
-        penalty = self.lambda_coefficient * self.theta
+        penalty = self.penalty_coefficient * self.theta
         N = len(X)
         K, D = self.theta.shape
         Tensor = np.repeat(X, D).reshape((N, K, D)) ** range(D)

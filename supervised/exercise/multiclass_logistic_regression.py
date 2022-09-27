@@ -39,28 +39,28 @@ y_train_C1 = deepcopy(y_train)
 y_train_C1[y_train_C1 != 1] = 0
 y_val_C1 = deepcopy(y_val)
 y_val_C1[y_val_C1 != 1] = 0
-classifier_1 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, lambda_coefficient=1)
+classifier_1 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, penalty_coefficient=1)
 classifier_1.fit(X_train, y_train_C1, X_val, y_val_C1)
 
 y_train_C2 = deepcopy(y_train)
 y_train_C2[y_train_C2 != 2] = 0
 y_val_C2 = deepcopy(y_val)
 y_val_C2[y_val_C2 != 2] = 0
-classifier_2 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, lambda_coefficient=1)
+classifier_2 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, penalty_coefficient=1)
 classifier_2.fit(X_train, y_train_C2, X_val, y_val_C2)
 
 y_train_C3 = deepcopy(y_train)
 y_train_C3[y_train_C3 != 3] = 0
 y_val_C3 = deepcopy(y_val)
 y_val_C3[y_val_C3 != 3] = 0
-classifier_3 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, lambda_coefficient=1)
+classifier_3 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, penalty_coefficient=1)
 classifier_3.fit(X_train, y_train_C3, X_val, y_val_C3)
 
 y_train_C4 = deepcopy(y_train)
 y_train_C4[y_train_C4 != 4] = 0
 y_val_C4 = deepcopy(y_val)
 y_val_C4[y_val_C4 != 4] = 0
-classifier_4 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, lambda_coefficient=1)
+classifier_4 = PolynomialLogisticRegression(1, K, lr, max_iterations=mat_iter, penalty_coefficient=1)
 classifier_4.fit(X_train, y_train_C4, X_val, y_val_C4)
 
 h = 0.5

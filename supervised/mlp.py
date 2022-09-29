@@ -43,12 +43,12 @@ class NeuralNetLayer:
 
 class MultilayerPerceptron:
 
-    def __init__(self, net_layers, learning_rate=1e-8, max_epochs=100, lambda_coefficient=0,
+    def __init__(self, net_layers, learning_rate=1e-8, max_epochs=100, penalty_coefficient=0,
                  problem_type="classification"):
         self.net_layers = net_layers
         self.learning_rate = learning_rate
         self.max_epochs = max_epochs
-        self.lambda_coefficient = lambda_coefficient
+        self.penalty_coefficient = penalty_coefficient
         self.iterations_metrics = {}
         self.problem_type = problem_type
 
@@ -81,7 +81,7 @@ class MultilayerPerceptron:
 
     def J(self, X, y):
         penalty = np.sum(np.array(list(map(lambda l: np.linalg.norm(l.weights), self.net_layers))))
-        cost = self.lambda_coefficient / 2 * penalty
+        cost = self.penalty_coefficient / 2 * penalty
         for x, y_r in zip(X, y):
             x = np.expand_dims(x, axis=0).T
             y_r = np.expand_dims(y_r, axis=0).T

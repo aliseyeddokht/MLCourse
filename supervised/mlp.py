@@ -118,34 +118,37 @@ class MultilayerPerceptron:
             sensitivity = np.identity(len(gradient)) * gradient @ self.net_layers[i + 1].weights.T @ sensitivity
             layer.weights -= self.learning_rate * sensitivity @ layer.input.T
 
-    def J(self, X, y):
-        penalty = np.sum(np.array(list(map(lambda l: np.linalg.norm(l.weights), self.net_layers))))
-        cost = self.penalty_coefficient / 2 * penalty
-        for x, y_r in zip(X, y):
-            x = np.expand_dims(x, axis=0).T
-            y_r = np.expand_dims(y_r, axis=0).T
-            y_h = self.predict(x)
-            if self.problem_type == "classification":
-                cost += y_r @ np.log(y_h) + (1 - y_r) @ np.log(1 - y_h)
-            else:
-                cost += np.linalg.norm(y_r - y_h) ** 2
-        return np.asscalar(cost / len(X))
-
     def evaluate(self, X_train, y_train, X_val, y_val):
+        y_h_t = np.array(list(map(lambda x: self.predict(x), X_train)))
+        y_h_v = np.array(list(map(lambda x: self.predict(x), X_val)))
         metrics = {}
-        metrics["J_TRAIN"] = self.J(X_train, y_train)
-        metrics["J_VAL"] = self.J(X_val, y_val)
+        if self.problem_type == "regression":
+            y_h_t = np.reshape(y_h_t, y_train.shape)
+            y_h_v = np.reshape(y_h_v, y_val.shape)
+            metrics["J_TRAIN"] = np.linalg.norm(y_train - y_h_t) ** 2 / len(X_train)
+            metrics["J_VAL"] = np.linalg.norm(y_val - y_h_v) ** 2 / len(X_val)
+        if self.problem_type == "classification":
+            metrics["J_TRAIN"] = np.sum(np.argmax(y_train, axis=1) != np.argmax(y_h_t, axis=1)) / len(X_train)
+            metrics["ACC_TRAIN"] = 1 - metrics["J_TRAIN"]
+            metrics["J_VAL"] = np.sum(np.argmax(y_val, axis=1) != np.argmax(y_h_v, axis=1)) / len(X_val)
+            metrics["ACC_VAL"] = 1 - metrics["J_TRAIN"]
+
         return metrics
 
     def visualize_model_performance(self):
         metrics = self.iterations_metrics
         plt.suptitle(f"MLP Evaluation")
         plt.xlabel("Iteration")
-        plt.ylabel("J")
+        plt.ylabel("Metric")
         iterations, J = range(len(metrics["J_TRAIN"])), metrics["J_TRAIN"]
-        plt.plot(iterations, J, label="Training")
-        iterations, mse = range(len(metrics["J_VAL"])), metrics["J_VAL"]
-        plt.plot(iterations, mse, label="Validation")
+        plt.plot(iterations, J, label="J_Training")
+        iterations, J = range(len(metrics["J_VAL"])), metrics["J_VAL"]
+        plt.plot(iterations, J, label="J_Validation")
+        if self.problem_type == "classification":
+            iterations, accuracy = range(len(metrics["ACC_TRAIN"])), metrics["ACC_TRAIN"]
+            plt.plot(iterations, accuracy, label="Accuracy_Training")
+            iterations, accuracy = range(len(metrics["ACC_VAL"])), metrics["ACC_VAL"]
+            plt.plot(iterations, accuracy, label="Accuracy_Validation")
         plt.legend()
         plt.show()
 

@@ -38,10 +38,9 @@ activation = Activation()
 layers = [
     NeuralNetLayer(3, 4, activation.linear, activation.derivative_linear),
     NeuralNetLayer(4, 4, activation.linear, activation.derivative_linear),
-    NeuralNetLayer(4, 4, activation.linear, activation.derivative_linear),
 ]
 
-mlp = MultilayerPerceptron(layers, max_epochs=200, learning_rate=6e-6, problem_type="regression")
+mlp = MultilayerPerceptron(layers, max_epochs=100, learning_rate=6e-6, problem_type="regression")
 mlp.fit(X_train, y_train, X_val, y_val)
 
 h = 0.5

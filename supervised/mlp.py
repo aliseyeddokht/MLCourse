@@ -1,3 +1,5 @@
+import enum
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -9,6 +11,21 @@ class Activation:
     def derivative_sigmoid(self, x):
         s = self.sigmoid(x)
         return s * (1 - s)
+
+    def tanh(self, x):
+        return 2 * self.sigmoid(2 * x) - 1
+
+    def derivative_tanh(self, x):
+        return 4 * self.derivative_sigmoid(2 * x)
+
+    def leaky_relu(self, x):
+        return np.maximum(0.1 * x, x)
+
+    def derivative_leaky_relu(self, x):
+        d = np.copy(x)
+        d[d > 0] = 1
+        d[d <= 0] = 0.1
+        return d
 
     def linear(self, x):
         return x
@@ -27,9 +44,31 @@ class Activation:
         return (f(x + epsilon) - f(x - epsilon)) / (2 * epsilon)
 
 
+class Initialization(enum.Enum):
+    UniformXavier = 1
+    NormalXavier = 2
+    UniformHe = 3
+    NormalHe = 4
+
+
 class NeuralNetLayer:
-    def __init__(self, number_of_inputs, number_of_outputs, activation_function, derivative_activation_function):
-        self.weights = np.random.rand(number_of_outputs, number_of_inputs)
+    def __init__(self, number_of_inputs, number_of_outputs, activation_function, derivative_activation_function,
+                 initialization=None):
+        if initialization == Initialization.UniformXavier:
+            a = np.sqrt(6 / (number_of_inputs + number_of_outputs))
+            self.weights = np.random.uniform(-a, a, (number_of_outputs, number_of_inputs))
+        elif initialization == Initialization.NormalXavier:
+            var = np.sqrt(2 / (number_of_inputs + number_of_outputs))
+            self.weights = np.random.normal(0, var, (number_of_outputs, number_of_inputs))
+        elif initialization == Initialization.UniformHe:
+            a = np.sqrt(6 / number_of_inputs)
+            self.weights = np.random.uniform(-a, a, (number_of_outputs, number_of_inputs))
+        elif initialization == Initialization.NormalHe:
+            var = np.sqrt(2 / number_of_inputs)
+            self.weights = np.random.normal(0, var, (number_of_outputs, number_of_inputs))
+        else:
+            self.weights = np.random.rand(number_of_outputs, number_of_inputs)
+
         self.activation_function = activation_function
         self.derivative_activation_function = derivative_activation_function
 
